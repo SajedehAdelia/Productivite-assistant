@@ -1,55 +1,53 @@
-from flask import Flask, render_template, request
-from datetime import datetime, timedelta
+from flask import Flask, render_template, request, jsonify
+from datetime import datetime
+import dateparser
 
 app = Flask(__name__)
 
-KEYWORDS = {
-    "meeting": "Meeting scheduled",
-    "gym": "Gym session",
-    "study": "Study time",
-    "work": "Work session",
-    "call": "Call planned",
-    "appointment": "Appointment set"
-}
-
 tasks = {}
 
-def get_month_days(month, year):
-    """Return a list of days for a given month and year."""
-    first_day = datetime(year, month, 1)
-    last_day = datetime(year, month + 1, 1) - timedelta(days=1)
-    
-    days = []
-    for day in range(1, last_day.day + 1):
-        date = datetime(year, month, day)
-        days.append(date)
-    
-    return days
+def parse_task_date(user_input):
+    """Parse the user's input to detect a specific date, like 'tomorrow' or '2025-05-05'."""
+    parsed_date = dateparser.parse(user_input)
+    if parsed_date:
+        return parsed_date.date()
+    return datetime.now().date()
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
 def index():
-    today = datetime.now().date()
+    return render_template("index.html")
 
-    if request.method == "POST":
-        user_input = request.form["user_input"]
-        task_time = request.form.get("time", "12:00")  
-        task_date = today  
+@app.route('/process_task', methods=['POST'])
+def process_task():
+    user_message = request.json.get('message', '')
+    print(f"Received message: {user_message}")
 
-        for keyword, description in KEYWORDS.items():
-            if keyword in user_input.lower():
-                task_description = f"{description} at {task_time}"
-                
-                tasks.setdefault(task_date, []).append(task_description)
-                
-                response = f"Task added: {task_description} on {task_date.strftime('%Y-%m-%d')}"
+    intents = {
+        'meeting': ['meeting', 'appointment', 'conference', 'meet'],
+        'call': ['call', 'phone', 'teleconference', 'ring'],
+        'gym': ['gym', 'workout', 'exercise', 'fitness'],
+        'reminder': ['remind', 'reminder', 'remember'],
+    }
+
+    detected_intent = None
+    for intent, keywords in intents.items():
+        for keyword in keywords:
+            if re.search(r'\b' + re.escape(keyword) + r'\b', user_message, re.IGNORECASE):
+                detected_intent = intent
                 break
-        else:
-            response = "No recognized task found."
+        if detected_intent:
+            break
 
-        return render_template("index.html", response=response, tasks=tasks, month_days=get_month_days(today.month, today.year), today=today)
+    # Date and time extraction
+    date_time = dateparser.parse(user_message)
 
-    return render_template("index.html", tasks=tasks, month_days=get_month_days(today.month, today.year), today=today)
+    if detected_intent:
+        response_message = f"Got it! I'll set a {detected_intent}."
+        if date_time:
+            response_message += f" Scheduled for {date_time.strftime('%A, %B %d at %I:%M %p')}."
+    else:
+        response_message = "Sorry, I didn't understand the task. Could you rephrase?"
 
-
+    return jsonify({'response': response_message})
 if __name__ == "__main__":
     app.run(debug=True)

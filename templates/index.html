@@ -5,45 +5,134 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productivity Assistant</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>Productivity Assistant</h1>
 
-        <div class="chatbox">
-            <form method="POST">
-                <input type="text" name="user_input" placeholder="Tell me your task..." required autofocus>
-                <input type="time" name="time" value="12:00" required> 
-                <button type="submit">Send</button>
-            </form>
+    <header>
+        Productivity Assistant
+        <p class="subtitle">Let me help you plan your day!</p>
+    </header>
 
-            {% if response %}
-            <div class="response">
-                {{ response }}
-            </div>
-            {% endif %}
-        </div>
-
-        <div class="calendar">
-            <h2>{{ today.strftime('%B %Y') }}</h2>
-            <div class="calendar-grid">
-                {% for day in month_days %}
-                    <div class="calendar-day {% if day.date() == today %}today{% endif %}">
-                        <div class="day-number">{{ day.day }}</div>
-                        <div class="task-list">
-                            {% if tasks.get(day.date()) %}
-                                {% for task in tasks[day.date()] %}
-                                    <div class="task">{{ task }}</div>
-                                {% endfor %}
-                            {% else %}
-                                <div class="no-task">No tasks</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-
+    <!-- Calendar Section -->
+    <div class="calendar">
+        <div class="month" id="monthTitle"></div>
+        <div class="weekdays" id="weekdays"></div>
+        <div class="days" id="days"></div>
     </div>
+
+    <!-- Chatbox Container -->
+    <div class="chat-container">
+        <div class="messages" id="messages">
+            <!-- Chat messages will appear here -->
+        </div>
+
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Type your task..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const currentDate = new Date();
+        let tasks = [];
+
+        function createCalendar() {
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            const currentMonth = currentDate.getMonth();
+            const currentYear = currentDate.getFullYear();
+
+            document.getElementById("monthTitle").textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+            document.getElementById("weekdays").innerHTML = dayNames.map(day => `<div>${day}</div>`).join("");
+
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            let calendarHTML = "";
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                calendarHTML += "<div class='empty'></div>"; 
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                calendarHTML += `<div class='day' id='day-${day}' onclick='showTasksForDay(${day})'>${day}</div>`;
+            }
+            document.getElementById("days").innerHTML = calendarHTML;
+        }
+
+        function showTasksForDay(day) {
+            const tasksForDay = tasks.filter(task => task.date === day);
+            const taskMessages = tasksForDay.map(task => `${task.time} - ${task.type}`).join("\n");
+
+            if (taskMessages) {
+                alert(`Tasks for ${day}:\n${taskMessages}`);
+            } else {
+                alert(`No tasks for ${day}`);
+            }
+        }
+
+        function sendMessage() {
+            const userMessage = document.getElementById("userInput").value;
+            if (!userMessage.trim()) return;
+
+            const messagesDiv = document.getElementById("messages");
+            const userDiv = document.createElement("div");
+            userDiv.classList.add("user");
+            userDiv.textContent = `You: ${userMessage}`;
+            messagesDiv.appendChild(userDiv);
+
+            document.getElementById("userInput").value = "";
+
+            setTimeout(() => {
+                const botMessage = generateBotResponse(userMessage);
+                const botDiv = document.createElement("div");
+                botDiv.classList.add("bot");
+                botDiv.textContent = `Assistant: ${botMessage}`;
+                messagesDiv.appendChild(botDiv);
+
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }, 800);
+        }
+
+        function generateBotResponse(message) {
+            const KEYWORDS = {
+                "meeting": "Meeting scheduled",
+                "gym": "Gym session",
+                "study": "Study time",
+                "work": "Work session",
+                "call": "Call planned",
+                "appointment": "Appointment set"
+            };
+
+            for (let keyword in KEYWORDS) {
+                if (message.toLowerCase().includes(keyword)) {
+                    const currentDay = currentDate.getDate();
+                    const taskTime = message.match(/\d{1,2}(:\d{2})?\s*(am|pm)/i);
+
+                    const task = {
+                        type: KEYWORDS[keyword],
+                        time: taskTime ? taskTime[0] : "unspecified time",
+                        date: currentDay 
+                    };
+                    tasks.push(task);
+
+                    const dayDiv = document.getElementById(`day-${currentDay}`);
+                    if (dayDiv) {
+                        dayDiv.classList.add('selected');
+                        const taskHTML = `<div class="task-mini">${task.type}</div>`;
+                        dayDiv.innerHTML = `${currentDay}<br>${taskHTML}`;
+                    }
+
+                    return `Task added: ${task.type} at ${task.time}`;
+                }
+            }
+
+            return "I couldn't quite catch that. Can you please rephrase?";
+        }
+
+        createCalendar();
+    </script>
+
 </body>
 </html>

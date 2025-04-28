@@ -1,114 +1,157 @@
-body {
+/* Reset */
+* {
+    box-sizing: border-box;
     margin: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #f9fafb;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding: 20px;
+    padding: 0;
 }
 
-.container {
-    width: 100%;
-    max-width: 500px;
-}
-
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #035A89;
-}
-
-.chatbox {
-    background: #ffffff;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-}
-
-form {
+/* Body and Fonts */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0a1f44, #220740);
+    color: #fff;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
 }
 
-input[type="text"], input[type="time"] {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    margin-bottom: 10px;
-}
-
-button {
-    padding: 10px;
-    background-color: #035A89;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #12435E;
-}
-
-.response {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #e7f5ff;
-    border-radius: 8px;
-}
-
-.calendar {
-    margin-top: 20px;
-}
-
-.calendar h2 {
+/* Header */
+header {
+    background: linear-gradient(90deg, #0a1f44, #6610f2);
+    width: 100%;
     text-align: center;
-    margin-bottom: 15px;
-    color: #035A89;
+    padding: 1rem 0;
+    font-size: 2rem;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    position: sticky;
+    top: 0;
 }
 
-.calendar-grid {
+.subtitle {
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    opacity: 0.8;
+}
+
+/* Calendar */
+.calendar {
+    margin: 2rem auto;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 800px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+}
+
+.month {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.weekdays, .days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    margin-top: 10px;
     gap: 10px;
 }
 
-.calendar-day {
-    background: #fff;
-    padding: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+.day, .empty {
+    background: linear-gradient(135deg, #0a1f44, #1f0647);
+    border-radius: 10px;
+    padding: 1rem 0;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s, transform 0.2s;
 }
 
-.day-number {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
+.day:hover {
+    background: linear-gradient(135deg, #6610f2, #00d4ff);
+    transform: scale(1.05);
+    cursor: pointer;
 }
 
-.task-list {
-    font-size: 14px;
-    color: #555;
+.selected {
+    background: linear-gradient(135deg, #00d4ff, #6610f2) !important;
 }
 
-.task {
-    background-color: #035A89;
-    color: white;
-    padding: 5px;
-    border-radius: 5px;
-    margin-bottom: 5px;
+/* Mini task inside day */
+.task-mini {
+    font-size: 0.7rem;
+    margin-top: 5px;
 }
 
-.no-task {
-    color: #aaa;
+/* Chatbox */
+.chat-container {
+    margin-top: 2rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 1rem;
+    width: 90%;
+    max-width: 800px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-.today {
-    background-color: #DFF0D8; /* Light green to highlight today */
+.messages {
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
+.user, .bot {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    max-width: 80%;
+}
+
+.user {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #0a1f44, #6610f2);
+}
+
+.bot {
+    align-self: flex-start;
+    background: linear-gradient(135deg, #6610f2, #00d4ff);
+}
+
+/* Input */
+.input-container {
+    display: flex;
+    gap: 1rem;
+}
+
+input[type="text"] {
+    flex-grow: 1;
+    padding: 0.8rem;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+}
+
+button {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #00d4ff, #6610f2);
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
