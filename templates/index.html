@@ -8,11 +8,12 @@
 </head>
 <body>
     <div class="container">
-        <h1> Productivity Assistant</h1>
+        <h1>Productivity Assistant</h1>
 
         <div class="chatbox">
             <form method="POST">
                 <input type="text" name="user_input" placeholder="Tell me your task..." required autofocus>
+                <input type="time" name="time" value="12:00" required> 
                 <button type="submit">Send</button>
             </form>
 
@@ -23,27 +24,26 @@
             {% endif %}
         </div>
 
-        {% if planning %}
-        <div class="planning">
-            <h2> Your Planning</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Task</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for event in planning %}
-                    <tr>
-                        <td>{{ event.time }}</td>
-                        <td>{{ event.task }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="calendar">
+            <h2>{{ today.strftime('%B %Y') }}</h2>
+            <div class="calendar-grid">
+                {% for day in month_days %}
+                    <div class="calendar-day {% if day.date() == today %}today{% endif %}">
+                        <div class="day-number">{{ day.day }}</div>
+                        <div class="task-list">
+                            {% if tasks.get(day.date()) %}
+                                {% for task in tasks[day.date()] %}
+                                    <div class="task">{{ task }}</div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="no-task">No tasks</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
-        {% endif %}
+
     </div>
 </body>
 </html>
