@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productivity Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1> Productivity Assistant</h1>
+
+        <div class="chatbox">
+            <form method="POST">
+                <input type="text" name="user_input" placeholder="Tell me your task..." required autofocus>
+                <button type="submit">Send</button>
+            </form>
+
+            {% if response %}
+            <div class="response">
+                {{ response }}
+            </div>
+            {% endif %}
+        </div>
+
+        {% if planning %}
+        <div class="planning">
+            <h2> Your Planning</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Task</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in planning %}
+                    <tr>
+                        <td>{{ event.time }}</td>
+                        <td>{{ event.task }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
