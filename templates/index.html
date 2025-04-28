@@ -105,31 +105,66 @@
                 "appointment": "Appointment set"
             };
 
+            const date = extractDateFromMessage(message);
+            if (!date) {
+                return "Could not understand the date. Please mention a date like 'today', 'tomorrow', or a specific date like '23rd April'.";
+            }
+
             for (let keyword in KEYWORDS) {
                 if (message.toLowerCase().includes(keyword)) {
-                    const currentDay = currentDate.getDate();
                     const taskTime = message.match(/\d{1,2}(:\d{2})?\s*(am|pm)/i);
-
                     const task = {
                         type: KEYWORDS[keyword],
                         time: taskTime ? taskTime[0] : "unspecified time",
-                        date: currentDay 
+                        date: date
                     };
                     tasks.push(task);
 
-                    const dayDiv = document.getElementById(`day-${currentDay}`);
+                    const dayDiv = document.getElementById(`day-${date}`);
                     if (dayDiv) {
-                        dayDiv.classList.add('selected');
-                        const taskHTML = `<div class="task-mini">${task.type}</div>`;
-                        dayDiv.innerHTML = `${currentDay}<br>${taskHTML}`;
+                        dayDiv.classList.add('selected');  
+                        const taskHTML = `<div class="task-mini">${task.type} at ${task.time}</div>`;
+                        dayDiv.innerHTML = `${date}<br>${taskHTML}`;
                     }
 
-                    return `Task added: ${task.type} at ${task.time}`;
+                    return `Task added: ${task.type} at ${task.time} on ${date}`;
                 }
             }
 
             return "I couldn't quite catch that. Can you please rephrase?";
         }
+
+        function extractDateFromMessage(message) {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+
+            const datePatterns = {
+                "today": today,
+                "tomorrow": tomorrow,
+            };
+
+            const specificDatePattern = /\b(\d{1,2})(st|nd|rd|th)?\s*(\w+)\b/i;
+            const match = message.match(specificDatePattern);
+            if (match) {
+                const day = parseInt(match[1]);
+                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                const month = monthNames.indexOf(match[3]);
+
+                const specificDate = new Date(today.getFullYear(), month, day);
+                return specificDate.getDate();  // Return the day of the month
+            }
+
+            const lowerMessage = message.toLowerCase();
+            for (let key in datePatterns) {
+                if (lowerMessage.includes(key)) {
+                    return datePatterns[key].getDate();
+                }
+            }
+
+            return null;  
+        }
+
 
         createCalendar();
     </script>
