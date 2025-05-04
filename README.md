@@ -31,9 +31,9 @@ A lightweight prototype of a mobile/web application to plan tasks via a chatbot-
 ## Examples of Recognised Keywords
 
 * `meeting` → "Meeting scheduled"
-* `gym` → "Gym session"
-* `study` → "Study time"
-* `work` → "Work session"
+* `gym` → "Gym session day 25 at 2pm"
+* `study` → "Study time day 12 at 6:25 am"
+* `work` → "Work session day 1"
 * `call` → "Call planned"
 * `appointment` → "Appointment set"
 
